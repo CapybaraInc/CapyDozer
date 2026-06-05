@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>CapyDozer — Уютный Мир</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.game-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 450px;
+    max-height: 800px;
+    overflow: hidden;
+    background: #f5e6d3;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(255, 180, 100, 0.3);
+}
+
+canvas {
+    display: block;
+}
+
+/* ===== HUD ===== */
+.hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hud-item {
+    background: rgba(255, 255, 255, 0.85);
+    color: #5D4037;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 2px solid rgba(139, 105, 20, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== ДЖОЙСТИК ===== */
+.joystick-zone {
+    position: absolute;
+    bottom: 25px;
+    left: 25px;
+    width: 110px;
+    height: 110px;
+    z-index: 20;
+}
+
+.joystick-base {
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    border: 3px solid rgba(139, 105, 20, 0.35);
+    position: relative;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.joystick-thumb {
+    width: 44px;
+    height: 44px;
+    background: radial-gradient(circle at 40% 40%, #FFB74D, #F57C00);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 18px rgba(255, 152, 0, 0.5);
+    transition: box-shadow 0.2s;
+}
+
+.joystick-thumb.active {
+    box-shadow: 0 0 30px rgba(255, 180, 0, 0.9);
+}
+
+/* ===== КНОПКИ ===== */
+.shop-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: 2px solid rgba(139, 105, 20, 0.3);
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reset-btn {
+    position: absolute;
+    top: 60px;
+    right: 12px;
+    z-index: 20;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: 2px solid rgba(139, 105, 20, 0.3);
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== МАГАЗИН ===== */
+.shop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 20px;
+}
+
+.shop-overlay.open {
+    display: flex;
+}
+
+.shop-title {
+    color: #FFD700;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.skin-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 130px;
+}
+
+.skin-card:active {
+    transform: scale(0.95);
+}
+
+.skin-card.owned {
+    border-color: rgba(76, 175, 80, 0.6);
+    background: rgba(76, 175, 80, 0.15);
+}
+
+.skin-card.selected {
+    border-color: #FFD700;
+    background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.skin-emoji {
+    font-size: 40px;
+    margin-bottom: 6px;
+}
+
+.skin-name {
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.skin-price {
+    font-size: 10px;
+    color: #FFD700;
+    margin-top: 4px;
+}
+
+.shop-close {
+    background: #FF8C00;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.shop-coins {
+    color: #FFD700;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* ===== УВЕДОМЛЕНИЯ ===== */
+.notification {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #FFD700;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 50;
+    pointer-events: none;
+    animation: notifFloat 2s ease-out forwards;
+}
+
+@keyframes notifFloat {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    70% {
+        opacity: 1;
+        transform: translate(-50%, -70%) scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.8);
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="game-wrapper" id="wrapper">
+    <canvas id="canvas"></canvas>
+
+    <div class="hud" id="hud">
+        <div class="hud-item">📏 <span id="meters">0</span> м разглажено</div>
+        <div class="hud-item">🌴 <span id="palms">0</span> пальм</div>
+        <div class="hud-item">🦫 <span id="friends">0</span> друзей</div>
+    </div>
+
+    <button class="shop-btn" id="shopBtn">🛒</button>
+    <button class="reset-btn" id="resetBtn">🔄</button>
+
+    <div class="joystick-zone" id="joystickZone">
+        <div class="joystick-base" id="joystickBase">
+            <div class="joystick-thumb" id="joystickThumb"></div>
+        </div>
+    </div>
+
+    <div class="shop-overlay" id="shop">
+        <div class="shop-title">🚜 Гараж бульдозеров</div>
+        <div class="shop-coins">🪙 <span id="shopCoins">0</span> монет</div>
+        <div class="shop-grid" id="shopGrid"></div>
+        <button class="shop-close" id="shopClose">Закрыть</button>
+    </div>
+</div>
+
+<script>
+// ============================================
+// CAPYDOZER — Медитативная песочница
+// Капибара на бульдозере разглаживает мир
+// ============================================
+
+(function() {
+    'use strict';
+
+    // ===== DOM =====
+    const wrapper = document.getElementById('wrapper');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const metersEl = document.getElementById('meters');
+    const palmsEl = document.getElementById('palms');
+    const friendsEl = document.getElementById('friends');
+    const shopEl = document.getElementById('shop');
+    const shopGrid = document.getElementById('shopGrid');
+    const shopCoinsEl = document.getElementById('shopCoins');
+    const joystickThumb = document.getElementById('joystickThumb');
+    const joystickBase = document.getElementById('joystickBase');
+
+    // ===== РАЗМЕРЫ =====
+    const WORLD_W = 1600;
+    const WORLD_H = 1200;
+    const TILE_SIZE = 20;
+
+    // ===== СОСТОЯНИЕ =====
+    const state = {
+        player: {
+            x: WORLD_W / 2,
+            y: WORLD_H / 2,
+            angle: 0,
+            speed: 1.5,
+            width: 50,
+            height: 35
+        },
+        camera: { x: 0, y: 0 },
+        input: { dx: 0, dy: 0, active: false, touchId: null, centerX: 0, centerY: 0 },
+        world: [], // 2D массив: 0 - скомканный, 1 - разглаженный
+        particles: [],
+        pals: [], // капибары-друзья
+        palms: [], // пальмы
+        smoothedCount: 0,
+        palmCount: 0,
+        friendCount: 0,
+        coins: 0,
+        shopOpen: false,
+        // Скины бульдозера
+        skins: [
+            { id: 0, name: 'Жёлтый', emoji: '🚜', price: 0, owned: true, desc: 'Классика' },
+            { id: 1, name: 'Арбуз-каток', emoji: '🍉', price: 100, owned: false, desc: 'Сочный' },
+            { id: 2, name: 'Плюшевый', emoji: '🧸', price: 200, owned: false, desc: 'Мягкий' },
+            { id: 3, name: 'Подушка', emoji: '🛏️', price: 150, owned: false, desc: 'Уютный' },
+            { id: 4, name: 'Золотой', emoji: '👑', price: 500, owned: false, desc: 'Премиум' },
+            { id: 5, name: 'Радужный', emoji: '🌈', price: 300, owned: false, desc: 'Весёлый' },
+        ],
+        currentSkin: 0,
+    };
+
+    // ===== ИНИЦИАЛИЗАЦИЯ МИРА =====
+    function initWorld() {
+        const cols = Math.ceil(WORLD_W / TILE_SIZE);
+        const rows = Math.ceil(WORLD_H / TILE_SIZE);
+        state.world = [];
+        for (let y = 0; y < rows; y++) {
+            state.world[y] = [];
+            for (let x = 0; x < cols; x++) {
+                // Случайные складки (0 - скомкано, 1 - гладко)
+                state.world[y][x] = Math.random() < 0.15 ? 1 : 0;
+            }
+        }
+        // Стартовая зона — гладкая
+        const startCol = Math.floor(state.player.x / TILE_SIZE);
+        const startRow = Math.floor(state.player.y / TILE_SIZE);
+        for (let dy = -3; dy <= 3; dy++) {
+            for (let dx = -3; dx <= 3; dx++) {
+                const cy = startRow + dy;
+                const cx = startCol + dx;
+                if (cy >= 0 && cy < rows && cx >= 0 && cx < cols) {
+                    state.world[cy][cx] = 1;
+                }
+            }
+        }
+        state.smoothedCount = 49;
+        state.palmCount = 0;
+        state.friendCount = 0;
+        state.palms = [];
+        state.pals = [];
+        state.particles = [];
+    }
+
+    // ===== РАЗГЛАЖИВАНИЕ =====
+    function smoothTile(col, row) {
+        if (row < 0 || row >= state.world.length || col < 0 || col >= state.world[0].length) return;
+        if (state.world[row][col] === 0) {
+            state.world[row][col] = 1;
+            state.smoothedCount++;
+            state.coins++;
+            // Частицы
+            const wx = col * TILE_SIZE + TILE_SIZE / 2;
+            const wy = row * TILE_SIZE + TILE_SIZE / 2;
+            spawnSmoothParticles(wx, wy);
+            // Шанс на пальму
+            if (Math.random() < 0.03 && state.palms.length < 50) {
+                state.palms.push({ x: wx, y: wy, size: 20 + Math.random() * 25 });
+                state.palmCount++;
+                showNotification('🌴 Пальма выросла!');
+            }
+            // Шанс на друга-капибару
+            if (Math.random() < 0.02 && state.pals.length < 20) {
+                state.pals.push({
+                    x: wx + random(-30, 30),
+                    y: wy + random(-30, 30),
+                    angle: random(0, Math.PI * 2),
+                    animTimer: random(0, 100)
+                });
+                state.friendCount++;
+                showNotification('🦫 Капибара пришла чиллить!');
+            }
+        }
+    }
+
+    function smoothArea(cx, cy, radius) {
+        const startCol = Math.floor((cx - radius) / TILE_SIZE);
+        const endCol = Math.floor((cx + radius) / TILE_SIZE);
+        const startRow = Math.floor((cy - radius) / TILE_SIZE);
+        const endRow = Math.floor((cy + radius) / TILE_SIZE);
+        for (let row = startRow; row <= endRow; row++) {
+            for (let col = startCol; col <= endCol; col++) {
+                smoothTile(col, row);
+            }
+        }
+    }
+
+    // ===== ЧАСТИЦЫ =====
+    function spawnSmoothParticles(x, y) {
+        for (let i = 0; i < 5; i++) {
+            state.particles.push({
+                x,
+                y,
+                vx: random(-1.5, 1.5),
+                vy: random(-2, -0.5),
+                life: 40 + random(0, 20),
+                type: Math.random() < 0.5 ? 'star' : 'petal',
+                color: Math.random() < 0.5 ? '#FFD700' : '#FFB7C5'
+            });
+        }
+    }
+
+    function updateParticles() {
+        state.particles = state.particles.filter(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.02;
+            p.life--;
+            return p.life > 0;
+        });
+    }
+
+    // ===== ОБНОВЛЕНИЕ =====
+    function update() {
+        if (state.shopOpen) return;
+
+        // Движение игрока
+        if (state.input.active) {
+            const speed = state.player.speed;
+            state.player.x += state.input.dx * speed;
+            state.player.y += state.input.dy * speed;
+            state.player.x = Math.max(20, Math.min(WORLD_W - 20, state.player.x));
+            state.player.y = Math.max(20, Math.min(WORLD_H - 20, state.player.y));
+
+            if (Math.abs(state.input.dx) > 0.1 || Math.abs(state.input.dy) > 0.1) {
+                state.player.angle = Math.atan2(state.input.dy, state.input.dx);
+            }
+
+            // Разглаживание под бульдозером
+            smoothArea(state.player.x, state.player.y, 25);
+        }
+
+        // Анимация друзей
+        state.pals.forEach(pal => {
+            pal.animTimer++;
+            if (pal.animTimer > 120) {
+                pal.animTimer = 0;
+                pal.angle = random(0, Math.PI * 2);
+            }
+            pal.x += Math.cos(pal.angle) * 0.2;
+            pal.y += Math.sin(pal.angle) * 0.2;
+            pal.x = Math.max(10, Math.min(WORLD_W - 10, pal.x));
+            pal.y = Math.max(10, Math.min(WORLD_H - 10, pal.y));
+        });
+
+        // Камера
+        const targetCX = state.player.x - canvas.width / 2;
+        const targetCY = state.player.y - canvas.height / 2;
+        state.camera.x += (targetCX - state.camera.x) * 0.08;
+        state.camera.y += (targetCY - state.camera.y) * 0.08;
+
+        updateParticles();
+        updateHUD();
+    }
+
+    function updateHUD() {
+        metersEl.textContent = state.smoothedCount;
+        palmsEl.textContent = state.palmCount;
+        friendsEl.textContent = state.friendCount;
+    }
+
+    // ===== ОТРИСОВКА =====
+    function drawWorld() {
+        const camX = state.camera.x;
+        const camY = state.camera.y;
+        const startCol = Math.max(0, Math.floor(camX / TILE_SIZE) - 1);
+        const endCol = Math.min(state.world[0].length - 1, Math.floor((camX + canvas.width) / TILE_SIZE) + 1);
+        const startRow = Math.max(0, Math.floor(camY / TILE_SIZE) - 1);
+        const endRow = Math.min(state.world.length - 1, Math.floor((camY + canvas.height) / TILE_SIZE) + 1);
+
+        for (let row = startRow; row <= endRow; row++) {
+            for (let col = startCol; col <= endCol; col++) {
+                const x = col * TILE_SIZE - camX;
+                const y = row * TILE_SIZE - camY;
+                if (state.world[row][col] === 1) {
+                    // Гладкая плитка
+                    const gradient = ctx.createLinearGradient(x, y, x + TILE_SIZE, y + TILE_SIZE);
+                    gradient.addColorStop(0, '#F5DEB3');
+                    gradient.addColorStop(0.5, '#FAEBD7');
+                    gradient.addColorStop(1, '#F5DEB3');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    ctx.strokeStyle = 'rgba(139,105,20,0.15)';
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                } else {
+                    // Скомканная земля
+                    const shade = 180 + Math.sin(col * 0.7) * 20 + Math.cos(row * 0.7) * 20;
+                    ctx.fillStyle = `rgb(${shade-20},${shade-40},${shade-60})`;
+                    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    // Складки
+                    ctx.strokeStyle = `rgba(${shade-40},${shade-60},${shade-80},0.4)`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + TILE_SIZE * 0.3);
+                    ctx.quadraticCurveTo(x + TILE_SIZE / 2, y + TILE_SIZE * 0.5, x + TILE_SIZE, y + TILE_SIZE * 0.2);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function drawPalms() {
+        state.palms.forEach(palm => {
+            const x = palm.x - state.camera.x;
+            const y = palm.y - state.camera.y;
+            // Ствол
+            ctx.fillStyle = '#A0522D';
+            ctx.fillRect(x - 3, y, 6, palm.size);
+            // Крона
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(x, y, palm.size * 0.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#388E3C';
+            ctx.beginPath();
+            ctx.arc(x - palm.size * 0.3, y - palm.size * 0.2, palm.size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + palm.size * 0.3, y - palm.size * 0.2, palm.size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    function drawPals() {
+        state.pals.forEach(pal => {
+            const x = pal.x - state.camera.x;
+            const y = pal.y - state.camera.y;
+            // Тело
+            ctx.fillStyle = '#A0792A';
+            ctx.beginPath();
+            ctx.arc(x, y, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#5a3e0a';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            // Глаза
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 4, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + 5, y - 4, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 4, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + 5, y - 4, 2, 0, Math.PI * 2);
+            ctx.fill();
+            // Апельсин
+            ctx.fillStyle = '#FF8C00';
+            ctx.beginPath();
+            ctx.arc(x, y - 18, 5, 0, Math.PI * 2);
+            ctx.fill();
+            // Zzz
+            if (Math.sin(pal.animTimer * 0.1) > 0.5) {
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.font = '10px sans-serif';
+                ctx.fillText('Z', x + 15, y - 10);
+            }
+        });
+    }
+
+    function drawPlayer() {
+        const x = state.player.x - state.camera.x;
+        const y = state.player.y - state.camera.y;
+        const skin = state.skins[state.currentSkin];
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(state.player.angle);
+
+        // Гусеницы
+        ctx.fillStyle = '#444';
+        ctx.fillRect(-30, -10, 60, 12);
+        ctx.fillRect(-30, 8, 60, 12);
+        // Полоски гусениц
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        for (let i = -25; i < 30; i += 8) {
+            ctx.beginPath();
+            ctx.moveTo(i, -10);
+            ctx.lineTo(i, -2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(i, 8);
+            ctx.lineTo(i, 20);
+            ctx.stroke();
+        }
+
+        // Корпус бульдозера
+        const bodyColors = {
+            0: '#FFD54F', // жёлтый
+            1: '#F44336', // арбуз (красный)
+            2: '#D7CCC8', // плюшевый
+            3: '#E8D5B7', // подушка
+            4: '#FFD700', // золотой
+            5: 'rgba(255,0,0,0.5)', // радужный (будет градиент)
+        };
+
+        ctx.fillStyle = bodyColors[skin.id] || '#FFD54F';
+
+        // Прямоугольный корпус
+        ctx.fillRect(-28, -15, 56, 30);
+        ctx.strokeStyle = '#5D4037';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-28, -15, 56, 30);
+
+        // Кабина
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillRect(-10, -22, 20, 12);
+        ctx.strokeStyle = '#5D4037';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-10, -22, 20, 12);
+
+        // Отвал (ковш спереди)
+        ctx.fillStyle = '#757575';
+        ctx.beginPath();
+        ctx.moveTo(30, -18);
+        ctx.lineTo(38, -22);
+        ctx.lineTo(38, 18);
+        ctx.lineTo(30, 22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Капибара в кабине
+        ctx.fillStyle = '#8B6914';
+        ctx.beginPath();
+        ctx.arc(0, -22, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#5a3e0a';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Кепка машиниста
+        ctx.fillStyle = '#2196F3';
+        ctx.fillRect(-8, -34, 16, 6);
+        ctx.fillRect(-5, -36, 10, 5);
+
+        // Птичка на капоте
+        ctx.fillStyle = '#FFD54F';
+        ctx.beginPath();
+        ctx.arc(-20, -20, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FF8C00';
+        ctx.beginPath();
+        ctx.moveTo(-17, -22);
+        ctx.lineTo(-13, -20);
+        ctx.lineTo(-17, -19);
+        ctx.fill();
+
+        ctx.restore();
+
+        // Эмодзи скина над бульдозером
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(skin.emoji, x, y - 35);
+    }
+
+    function drawParticles() {
+        state.particles.forEach(p => {
+            const x = p.x - state.camera.x;
+            const y = p.y - state.camera.y;
+            const alpha = p.life / 60;
+            ctx.fillStyle = p.color.replace(')', `,${alpha})`).replace('rgb', 'rgba');
+            if (p.type === 'star') {
+                ctx.font = `${8 + p.life/10}px sans-serif`;
+                ctx.fillText('✦', x, y);
+            } else {
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+    }
+
+    function draw() {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        ctx.fillStyle = '#E8D5B7';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawWorld();
+        drawPalms();
+        drawPals();
+        drawParticles();
+        drawPlayer();
+    }
+
+    // ===== МАГАЗИН =====
+    function openShop() {
+        state.shopOpen = true;
+        shopEl.classList.add('open');
+        shopCoinsEl.textContent = state.coins;
+        renderShop();
+    }
+
+    function closeShop() {
+        state.shopOpen = false;
+        shopEl.classList.remove('open');
+    }
+
+    function renderShop() {
+        shopGrid.innerHTML = '';
+        state.skins.forEach(skin => {
+            const card = document.createElement('div');
+            card.className = 'skin-card';
+            if (skin.owned) card.classList.add('owned');
+            if (skin.id === state.currentSkin) card.classList.add('selected');
+            card.innerHTML = `
+                <div class="skin-emoji">${skin.emoji}</div>
+                <div class="skin-name">${skin.name}</div>
+                <div class="skin-price">${skin.owned ? '✅ Куплен' : '🪙 ' + skin.price}</div>
+            `;
+            card.addEventListener('click', () => {
+                if (skin.owned) {
+                    state.currentSkin = skin.id;
+                    renderShop();
+                } else if (state.coins >= skin.price) {
+                    state.coins -= skin.price;
+                    skin.owned = true;
+                    state.currentSkin = skin.id;
+                    shopCoinsEl.textContent = state.coins;
+                    renderShop();
+                    showNotification('🚜 Новый бульдозер!');
+                } else {
+                    showNotification('🪙 Не хватает монет');
+                }
+            });
+            shopGrid.appendChild(card);
+        });
+    }
+
+    function showNotification(text) {
+        const notif = document.createElement('div');
+        notif.className = 'notification';
+        notif.textContent = text;
+        wrapper.appendChild(notif);
+        setTimeout(() => notif.remove(), 2000);
+    }
+
+    // ===== ДЖОЙСТИК =====
+    function setupJoystick() {
+        const zone = document.getElementById('joystickZone');
+        const rect = joystickBase.getBoundingClientRect();
+        state.input.centerX = rect.left + rect.width / 2;
+        state.input.centerY = rect.top + rect.height / 2;
+
+        zone.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const t = e.changedTouches[0];
+            state.input.touchId = t.identifier;
+            state.input.active = true;
+            joystickThumb.classList.add('active');
+            updateJoystick(t.clientX, t.clientY);
+        }, { passive: false });
+
+        zone.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === state.input.touchId) {
+                    updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                }
+            }
+        }, { passive: false });
+
+        zone.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            state.input.active = false;
+            state.input.dx = 0;
+            state.input.dy = 0;
+            state.input.touchId = null;
+            joystickThumb.classList.remove('active');
+            joystickThumb.style.transform = 'translate(-50%, -50%)';
+        }, { passive: false });
+
+        // Мышь (ПК)
+        zone.addEventListener('mousedown', (e) => {
+            state.input.active = true;
+            state.input.touchId = 'mouse';
+            joystickThumb.classList.add('active');
+            updateJoystick(e.clientX, e.clientY);
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (state.input.touchId === 'mouse') updateJoystick(e.clientX, e.clientY);
+        });
+        window.addEventListener('mouseup', () => {
+            if (state.input.touchId === 'mouse') {
+                state.input.active = false;
+                state.input.dx = 0;
+                state.input.dy = 0;
+                state.input.touchId = null;
+                joystickThumb.classList.remove('active');
+                joystickThumb.style.transform = 'translate(-50%, -50%)';
+            }
+        });
+    }
+
+    function updateJoystick(cx, cy) {
+        const dx = cx - state.input.centerX;
+        const dy = cy - state.input.centerY;
+        const maxR = 40;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const clampDist = Math.min(dist, maxR);
+        if (dist > 0) {
+            const angle = Math.atan2(dy, dx);
+            const tx = Math.cos(angle) * clampDist;
+            const ty = Math.sin(angle) * clampDist;
+            joystickThumb.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px))`;
+            state.input.dx = dx / maxR;
+            state.input.dy = dy / maxR;
+        }
+    }
+
+    // ===== КНОПКИ =====
+    document.getElementById('shopBtn').addEventListener('click', openShop);
+    document.getElementById('shopClose').addEventListener('click', closeShop);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        initWorld();
+        showNotification('🔄 Мир обновлён!');
+    });
+
+    // ===== ВСПОМОГАТЕЛЬНЫЕ =====
+    function random(min, max) { return Math.random() * (max - min) + min; }
+
+    // ===== ЦИКЛ =====
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // ===== СТАРТ =====
+    function init() {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        initWorld();
+        setupJoystick();
+        updateHUD();
+        gameLoop();
+        console.log('🦫🚜 CapyDozer готов! Разглаживай мир!');
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+    });
+
+    init();
+})();
+</script>
+
+</body>
+</html>
