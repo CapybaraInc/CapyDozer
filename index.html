@@ -11,6 +11,9 @@ body{background:#1a1a2e;display:flex;justify-content:center;align-items:center;h
 canvas{display:block}
 .hud{position:absolute;top:10px;left:8px;z-index:10;pointer-events:none;display:flex;flex-direction:column;gap:4px}
 .hud-item{background:rgba(255,255,255,0.85);color:#5D4037;padding:5px 10px;border-radius:14px;font-size:10px;font-weight:600;border:2px solid rgba(139,105,20,0.3);box-shadow:0 2px 4px rgba(0,0,0,0.08)}
+.level-bar{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;background:rgba(255,255,255,0.85);color:#5D4037;padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;border:2px solid rgba(139,105,20,0.3);box-shadow:0 2px 4px rgba(0,0,0,0.08);display:none;text-align:center}
+.level-progress{width:80px;height:6px;background:rgba(0,0,0,0.1);border-radius:6px;margin:3px auto 0;overflow:hidden}
+.level-fill{height:100%;background:linear-gradient(90deg,#FF8C00,#FFD700);border-radius:6px;transition:width 0.3s}
 .joystick-zone{position:absolute;bottom:20px;left:20px;width:110px;height:110px;z-index:20}
 .joystick-base{width:100px;height:100px;background:rgba(255,255,255,0.4);border-radius:50%;border:3px solid rgba(139,105,20,0.35);position:relative;backdrop-filter:blur(4px)}
 .joystick-thumb{width:44px;height:44px;background:radial-gradient(circle at 40% 40%,#FFB74D,#F57C00);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,0.6);box-shadow:0 0 18px rgba(255,152,0,0.5)}
@@ -22,13 +25,16 @@ canvas{display:block}
 .panel-overlay.open{display:flex}
 .panel-title{color:#FFD700;font-size:20px;font-weight:bold;margin-bottom:12px;text-shadow:0 0 15px rgba(255,215,0,0.5)}
 .panel-coins{color:#FFD700;font-size:13px;margin-bottom:10px}
+.panel-tabs{display:flex;gap:8px;margin-bottom:12px}
+.panel-tab{padding:8px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.08);color:#ddd;font-size:11px;cursor:pointer;font-weight:bold}
+.panel-tab.active{background:#FF8C00;border-color:#FF8C00;color:white}
 .skin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:250px;overflow-y:auto;padding:4px;width:100%}
 .skin-card{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:10px;text-align:center;cursor:pointer;transition:all 0.2s}
 .skin-card:active{transform:scale(0.95)}
 .skin-card.owned{border-color:rgba(76,175,80,0.6);background:rgba(76,175,80,0.15)}
 .skin-card.selected{border-color:#FFD700;background:rgba(255,215,0,0.2);box-shadow:0 0 15px rgba(255,215,0,0.4)}
 .skin-emoji{font-size:36px;margin-bottom:4px}
-.skin-name{font-size:11px;font-weight:bold}
+.skin-name{font-size:10px;font-weight:bold}
 .skin-price{font-size:9px;color:#FFD700;margin-top:2px}
 .upgrade-grid{width:100%;display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto}
 .upgrade-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -45,6 +51,18 @@ canvas{display:block}
 .panel-close{background:#FF8C00;color:white;border:none;padding:10px 25px;border-radius:18px;font-size:14px;font-weight:bold;cursor:pointer;margin-top:12px;width:100%;max-width:200px}
 .cloud-text{position:absolute;pointer-events:none;z-index:50;font-weight:bold;font-size:14px;color:#8B6914;animation:cloudFloat 1.5s ease-out forwards;text-shadow:0 0 6px rgba(255,255,255,0.8)}
 @keyframes cloudFloat{0%{opacity:1;transform:translateY(0) scale(0.5)}50%{opacity:1;transform:translateY(-25px) scale(1.2)}100%{opacity:0;transform:translateY(-50px) scale(1)}}
+/* ===== ЭКРАН ЗАВЕРШЕНИЯ УРОВНЯ ===== */
+.level-complete{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.level-complete.open{display:flex}
+.lc-canvas-wrap{background:#f5e6d3;border-radius:16px;padding:10px;border:3px solid #FFD700;box-shadow:0 0 30px rgba(255,215,0,0.5);margin-bottom:15px}
+.lc-emoji{font-size:60px;animation:lcBounce 0.6s ease-in-out infinite}
+@keyframes lcBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.lc-title{color:#FFD700;font-size:24px;font-weight:bold;margin:10px 0;text-shadow:0 0 20px rgba(255,215,0,0.6)}
+.lc-subtitle{color:#ddd;font-size:14px;margin-bottom:5px}
+.lc-reward{color:#4CAF50;font-size:18px;font-weight:bold;margin:5px 0}
+.lc-btn{background:#FF8C00;color:white;border:none;padding:14px 30px;border-radius:25px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;box-shadow:0 0 20px rgba(255,140,0,0.5)}
+.lc-btn:active{transform:scale(0.95)}
+.lc-stars{font-size:40px;margin:10px 0}
 </style>
 </head>
 <body>
@@ -52,12 +70,18 @@ canvas{display:block}
     <canvas id="canvas"></canvas>
     <canvas class="minimap" id="minimap" width="60" height="60"></canvas>
     <div class="hud" id="hud">
-        <div class="hud-item">📏 <span id="meters">0</span> м²</div>
+        <div class="hud-item">📏 <span id="meters">0</span></div>
         <div class="hud-item">🌴 <span id="palms">0</span></div>
         <div class="hud-item">🦫 <span id="friends">0</span></div>
         <div class="hud-item">🪙 <span id="coinHud">0</span></div>
     </div>
+    <div class="level-bar" id="levelBar">
+        🎯 <span id="levelNum">1</span>: <span id="levelName">Апельсин</span>
+        <div class="level-progress"><div class="level-fill" id="levelFill" style="width:0%"></div></div>
+        <span style="font-size:9px" id="levelPercent">0%</span>
+    </div>
     <div class="side-btns">
+        <button class="side-btn" id="btnLevels">🎯</button>
         <button class="side-btn" id="btnUpgrade">📈</button>
         <button class="side-btn" id="btnShop">🛒</button>
         <button class="side-btn" id="btnReset">🔄</button>
@@ -65,6 +89,18 @@ canvas{display:block}
     <div class="joystick-zone" id="joystickZone">
         <div class="joystick-base" id="joystickBase"><div class="joystick-thumb" id="joystickThumb"></div></div>
     </div>
+    
+    <!-- ЭКРАН ЗАВЕРШЕНИЯ УРОВНЯ -->
+    <div class="level-complete" id="levelComplete">
+        <div class="lc-emoji" id="lcEmoji">🍊</div>
+        <div class="lc-title" id="lcTitle">МОЛОДЕЦ!</div>
+        <div class="lc-subtitle" id="lcSubtitle">Ты разгладил фигуру!</div>
+        <div class="lc-canvas-wrap"><canvas id="lcCanvas" width="200" height="200"></canvas></div>
+        <div class="lc-stars">⭐⭐⭐</div>
+        <div class="lc-reward">🪙 +<span id="lcReward">50</span></div>
+        <button class="lc-btn" id="lcNext">▶ Следующий уровень</button>
+    </div>
+    
     <div class="panel-overlay" id="panelUpgrade">
         <div class="panel-title">📈 Прокачка</div>
         <div class="panel-coins">🪙 <span id="upgradeCoins">0</span></div>
@@ -72,16 +108,26 @@ canvas{display:block}
         <button class="panel-close" id="closeUpgrade">Закрыть</button>
     </div>
     <div class="panel-overlay" id="panelShop">
-        <div class="panel-title">🚜 Гараж</div>
+        <div class="panel-title">🛒 Магазин</div>
         <div class="panel-coins">🪙 <span id="shopCoins">0</span></div>
+        <div class="panel-tabs">
+            <button class="panel-tab active" data-tab="dozer">🚜 Бульдозеры</button>
+            <button class="panel-tab" data-tab="capy">🦫 Капибары</button>
+        </div>
         <div class="skin-grid" id="shopGrid"></div>
         <button class="panel-close" id="closeShop">Закрыть</button>
+    </div>
+    <div class="panel-overlay" id="panelLevels">
+        <div class="panel-title">🎯 Уровни</div>
+        <div class="skin-grid" id="levelsGrid" style="max-height:400px"></div>
+        <button class="panel-close" id="closeLevels">Закрыть</button>
     </div>
 </div>
 
 <script>
 (function(){
 'use strict';
+// ===== DOM =====
 const wrapper=document.getElementById('wrapper');
 const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
@@ -91,60 +137,108 @@ const metersEl=document.getElementById('meters');
 const palmsEl=document.getElementById('palms');
 const friendsEl=document.getElementById('friends');
 const coinHudEl=document.getElementById('coinHud');
+const levelBar=document.getElementById('levelBar');
+const levelNum=document.getElementById('levelNum');
+const levelName=document.getElementById('levelName');
+const levelFill=document.getElementById('levelFill');
+const levelPercent=document.getElementById('levelPercent');
 const joystickThumb=document.getElementById('joystickThumb');
 const joystickBase=document.getElementById('joystickBase');
 const panelUpgrade=document.getElementById('panelUpgrade');
 const panelShop=document.getElementById('panelShop');
+const panelLevels=document.getElementById('panelLevels');
 const upgradeGrid=document.getElementById('upgradeGrid');
 const shopGrid=document.getElementById('shopGrid');
+const levelsGrid=document.getElementById('levelsGrid');
 const upgradeCoinsEl=document.getElementById('upgradeCoins');
 const shopCoinsEl=document.getElementById('shopCoins');
+const levelComplete=document.getElementById('levelComplete');
+const lcEmoji=document.getElementById('lcEmoji');
+const lcTitle=document.getElementById('lcTitle');
+const lcSubtitle=document.getElementById('lcSubtitle');
+const lcReward=document.getElementById('lcReward');
+const lcCanvas=document.getElementById('lcCanvas');
+const lcCtx=lcCanvas.getContext('2d');
 
 const WORLD_W=4000,WORLD_H=3000,TILE_SIZE=20;
 
+// ===== УРОВНИ-ФИГУРЫ =====
+const LEVELS=[
+    {name:'Апельсин',emoji:'🍊',color:'#FF9800',reward:50,
+        shape:function(col,row,cx,cy,r){return Math.hypot(col-cx,row-cy)<r;},
+        draw:function(ctx,w,h){ctx.fillStyle='#FF9800';ctx.beginPath();ctx.arc(w/2,h/2,w*0.35,0,Math.PI*2);ctx.fill();
+            ctx.fillStyle='#2E7D32';ctx.beginPath();ctx.arc(w/2,h/2-w*0.35,w*0.08,0,Math.PI*2);ctx.fill();
+            ctx.fillStyle='white';ctx.beginPath();ctx.arc(w*0.35,h*0.38,w*0.06,0,Math.PI*2);ctx.fill();}},
+    {name:'Капибара',emoji:'🦫',color:'#8B6914',reward:80,
+        shape:function(col,row,cx,cy,r){const dx=col-cx,dy=row-cy;return(Math.hypot(dx,dy)<r)||(Math.abs(dx)<r*0.6&&dy>0&&dy<r*1.2)||(Math.abs(dx-r*0.7)<r*0.3&&Math.abs(dy+r*0.5)<r*0.3)||(Math.abs(dx+r*0.7)<r*0.3&&Math.abs(dy+r*0.5)<r*0.3);},
+        draw:function(ctx,w,h){ctx.fillStyle='#8B6914';ctx.beginPath();ctx.ellipse(w/2,h/2,w*0.35,h*0.3,0,0,Math.PI*2);ctx.fill();
+            ctx.beginPath();ctx.ellipse(w/2,h/2-w*0.25,w*0.2,h*0.18,0,0,Math.PI*2);ctx.fill();
+            ctx.fillStyle='white';ctx.beginPath();ctx.arc(w*0.4,h*0.32,w*0.05,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(w*0.6,h*0.32,w*0.05,0,Math.PI*2);ctx.fill();
+            ctx.fillStyle='#1a1a1a';ctx.beginPath();ctx.arc(w*0.4,h*0.32,w*0.025,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(w*0.6,h*0.32,w*0.025,0,Math.PI*2);ctx.fill();
+            ctx.fillStyle='#3a2000';ctx.beginPath();ctx.arc(w/2,h/2+w*0.08,w*0.04,0,Math.PI*2);ctx.fill();}},
+    {name:'Сердце',emoji:'❤️',color:'#E91E63',reward:60,
+        shape:function(col,row,cx,cy,r){const dx=col-cx,dy=cy-row;const x=dx/r,y=dy/r;return Math.pow(x*x+y*y-1,3)-x*x*y*y*y<0;},
+        draw:function(ctx,w,h){ctx.fillStyle='#E91E63';ctx.beginPath();ctx.moveTo(w/2,h*0.8);ctx.bezierCurveTo(w*0.1,h*0.4,w*0.1,h*0.05,w/2,h*0.2);ctx.bezierCurveTo(w*0.9,h*0.05,w*0.9,h*0.4,w/2,h*0.8);ctx.fill();}},
+    {name:'Звезда',emoji:'⭐',color:'#FFD700',reward:70,
+        shape:function(col,row,cx,cy,r){const dx=Math.abs(col-cx),dy=Math.abs(cy-row);return(dx+dy<r*1.2)||(dx<r*0.3&&dy<r*1.4)||(dy<r*0.3&&dx<r*1.4);},
+        draw:function(ctx,w,h){ctx.fillStyle='#FFD700';ctx.beginPath();for(let i=0;i<5;i++){const a=Math.PI/2+i*Math.PI*2/5;const x=w/2+Math.cos(a)*w*0.4,y=h/2-Math.sin(a)*h*0.4;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();ctx.fill();}},
+    {name:'Домик',emoji:'🏠',color:'#FF5722',reward:90,
+        shape:function(col,row,cx,cy,r){const dx=col-cx,dy=row-cy;return(Math.abs(dx)<r&&dy>0&&dy<r)||(Math.abs(dx)<r*0.5&&dy<0&&dy>-r*0.6)||(dy<0&&Math.abs(dx)<r*(1+dy/(r*0.6)));},
+        draw:function(ctx,w,h){ctx.fillStyle='#FF5722';ctx.fillRect(w*0.2,h*0.4,w*0.6,h*0.5);ctx.fillStyle='#5D4037';ctx.beginPath();ctx.moveTo(w*0.1,h*0.4);ctx.lineTo(w/2,h*0.1);ctx.lineTo(w*0.9,h*0.4);ctx.fill();ctx.fillStyle='#FFD700';ctx.fillRect(w*0.4,h*0.6,w*0.2,h*0.3);}},
+    {name:'Луна',emoji:'🌙',color:'#FFC107',reward:55,
+        shape:function(col,row,cx,cy,r){const dx=col-cx,dy=row-cy;return Math.hypot(dx,dy)<r&&(dx>0||Math.hypot(dx+r*0.4,dy)>r*0.8);},
+        draw:function(ctx,w,h){ctx.fillStyle='#FFC107';ctx.beginPath();ctx.arc(w/2,h/2,w*0.35,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f5e6d3';ctx.beginPath();ctx.arc(w*0.62,h*0.42,w*0.28,0,Math.PI*2);ctx.fill();}},
+    {name:'Корона',emoji:'👑',color:'#FFD700',reward:100,
+        shape:function(col,row,cx,cy,r){const dx=Math.abs(col-cx),dy=row-cy;return(dy>0&&dy<r*0.4&&dx<r)||(dy<0&&dx<r*0.8&&dy>-r*0.5)||(dy<-r*0.5&&dx<r*0.25&&dy>-r*0.9)||(Math.abs(dx-r*0.6)<r*0.2&&dy<-r*0.2&&dy>-r*0.6)||(Math.abs(dx+r*0.6)<r*0.2&&dy<-r*0.2&&dy>-r*0.6);},
+        draw:function(ctx,w,h){ctx.fillStyle='#FFD700';ctx.fillRect(w*0.15,h*0.4,w*0.7,h*0.15);ctx.fillRect(w*0.2,h*0.25,w*0.1,h*0.2);ctx.fillRect(w*0.7,h*0.25,w*0.1,h*0.2);ctx.fillRect(w*0.4,h*0.2,w*0.2,h*0.1);ctx.beginPath();ctx.arc(w*0.15,h*0.4,w*0.08,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(w*0.85,h*0.4,w*0.08,0,Math.PI*2);ctx.fill();}},
+];
+
 function random(min,max){return Math.random()*(max-min)+min}
 function showNotification(text){
-    const n=document.createElement('div');n.className='notification';n.textContent=text;
-    wrapper.appendChild(n);setTimeout(()=>n.remove(),2500);
+    const n=document.createElement('div');n.className='notification';n.textContent=text;wrapper.appendChild(n);setTimeout(()=>n.remove(),2500);
 }
 function showCloudText(x,y,text,color){
-    const ct=document.createElement('div');ct.className='cloud-text';
-    ct.textContent=text;ct.style.left=x+'px';ct.style.top=y+'px';
-    if(color)ct.style.color=color;
-    wrapper.appendChild(ct);setTimeout(()=>ct.remove(),1500);
+    const ct=document.createElement('div');ct.className='cloud-text';ct.textContent=text;ct.style.left=x+'px';ct.style.top=y+'px';
+    if(color)ct.style.color=color;wrapper.appendChild(ct);setTimeout(()=>ct.remove(),1500);
 }
 
 const state={
-    player:{x:WORLD_W/2,y:WORLD_H/2,angle:0},
-    camera:{x:0,y:0},
+    player:{x:WORLD_W/2,y:WORLD_H/2,angle:0},camera:{x:0,y:0},
     input:{dx:0,dy:0,active:false,touchId:null,centerX:0,centerY:0},
     world:[],particles:[],pals:[],palms:[],
-    smoothedCount:0,palmCount:0,friendCount:0,coins:0,currentSkin:0,
-    goldenRain:{active:false,x:0,y:0,timer:0,drops:[]},
-    crystalTiles:[],
-    whirlwinds:[],
-    birdCooldown:0,birdFlying:false,birdReturnTimer:0,
-    dailyBonusClaimed:false,
+    smoothedCount:0,palmCount:0,friendCount:0,coins:0,
+    currentDozerSkin:0,currentCapySkin:0,
+    currentLevel:0,levelCompleted:[],levelJustCompleted:false,
+    goldenRain:{active:false,x:0,y:0,timer:0,drops:[]},crystalTiles:[],whirlwinds:[],
+    birdCooldown:0,birdFlying:false,birdReturnTimer:0,dailyBonusClaimed:false,
     upgrades:{
         speed:{level:1,max:10,baseCost:50,name:'Скорость',emoji:'⚡',desc:'Быстрее ездить'},
         width:{level:1,max:8,baseCost:80,name:'Ширина ковша',emoji:'📏',desc:'Шире разглаживать'},
         palmChance:{level:0,max:6,baseCost:100,name:'Пальмовый рай',emoji:'🌴',desc:'Чаще растут пальмы'},
-        friendChance:{level:0,max:5,baseCost:120,name:'Магнит друзей',emoji:'🦫',desc:'Больше капибар приходит'},
-        coinMult:{level:0,max:7,baseCost:150,name:'Монетный бонус',emoji:'🪙',desc:'Больше монет за разглаживание'},
+        friendChance:{level:0,max:5,baseCost:120,name:'Магнит друзей',emoji:'🦫',desc:'Больше капибар'},
+        coinMult:{level:0,max:7,baseCost:150,name:'Монетный бонус',emoji:'🪙',desc:'Больше монет'},
         smoothPower:{level:0,max:5,baseCost:200,name:'Сила утюга',emoji:'🔥',desc:'Глубже разглаживает'},
-        autoHeal:{level:0,max:3,baseCost:300,name:'Авто-пальмы',emoji:'🌿',desc:'Пальмы сами растут вокруг'},
+        autoHeal:{level:0,max:3,baseCost:300,name:'Авто-пальмы',emoji:'🌿',desc:'Пальмы сами растут'},
         luckBoost:{level:0,max:4,baseCost:250,name:'Удача',emoji:'🍀',desc:'Шанс на редкие события'},
     },
-    skins:[
-        {id:0,name:'Жёлтый',emoji:'🚜',price:0,owned:true},
-        {id:1,name:'Арбуз-каток',emoji:'🍉',price:100,owned:false},
-        {id:2,name:'Плюшевый',emoji:'🧸',price:200,owned:false},
-        {id:3,name:'Подушка',emoji:'🛏️',price:150,owned:false},
-        {id:4,name:'Золотой',emoji:'👑',price:500,owned:false},
-        {id:5,name:'Радужный',emoji:'🌈',price:300,owned:false},
-        {id:6,name:'Космический',emoji:'🚀',price:600,owned:false},
-        {id:7,name:'Пончик',emoji:'🍩',price:350,owned:false},
+    dozerSkins:[
+        {id:0,name:'Жёлтый',emoji:'🚜',price:0,owned:true},{id:1,name:'Арбуз-каток',emoji:'🍉',price:100,owned:false},
+        {id:2,name:'Плюшевый',emoji:'🧸',price:200,owned:false},{id:3,name:'Подушка',emoji:'🛏️',price:150,owned:false},
+        {id:4,name:'Золотой',emoji:'👑',price:500,owned:false},{id:5,name:'Радужный',emoji:'🌈',price:300,owned:false},
+        {id:6,name:'Космический',emoji:'🚀',price:600,owned:false},{id:7,name:'Пончик',emoji:'🍩',price:350,owned:false},
     ],
+    capySkins:[
+        {id:0,name:'Обычная',emoji:'🦫',price:0,owned:true,hat:null},
+        {id:1,name:'Корона',emoji:'👑',price:80,owned:false,hat:'crown'},
+        {id:2,name:'Кепка',emoji:'🧢',price:60,owned:false,hat:'cap'},
+        {id:3,name:'Очки',emoji:'😎',price:70,owned:false,hat:'glasses'},
+        {id:4,name:'Бантик',emoji:'🎀',price:50,owned:false,hat:'bow'},
+        {id:5,name:'Ниндзя',emoji:'🥷',price:120,owned:false,hat:'ninja'},
+        {id:6,name:'Шапка',emoji:'🧣',price:90,owned:false,hat:'beanie'},
+        {id:7,name:'Монокль',emoji:'🧐',price:110,owned:false,hat:'tophat'},
+        {id:8,name:'Цветок',emoji:'🌸',price:60,owned:false,hat:'flower'},
+    ],
+    currentTab:'dozer',
 };
 
 function getSpeed(){return 1.2+state.upgrades.speed.level*0.35}
@@ -159,277 +253,155 @@ function getLuckBoost(){return state.upgrades.luckBoost.level*0.04}
 function initWorld(){
     const cols=Math.ceil(WORLD_W/TILE_SIZE),rows=Math.ceil(WORLD_H/TILE_SIZE);
     state.world=[];state.crystalTiles=[];
-    for(let y=0;y<rows;y++){
-        state.world[y]=[];
-        for(let x=0;x<cols;x++){
-            state.world[y][x]=Math.random()<0.08?1:0;
-            if(state.world[y][x]===0&&Math.random()<0.02)state.crystalTiles.push({col:x,row:y});
-        }
-    }
+    const level=LEVELS[state.currentLevel];
+    const cx=Math.floor(cols/2),cy=Math.floor(rows/2),r=Math.floor(Math.min(cols,rows)*0.22);
+    for(let y=0;y<rows;y++){state.world[y]=[];for(let x=0;x<cols;x++){
+        if(level.shape(x,y,cx,cy,r)){state.world[y][x]=0;if(Math.random()<0.03)state.crystalTiles.push({col:x,row:y})}
+        else state.world[y][x]=Math.random()<0.05?1:0;
+    }}
     const sc=Math.floor(state.player.x/TILE_SIZE),sr=Math.floor(state.player.y/TILE_SIZE);
-    for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){
-        const cy=sr+dy,cx=sc+dx;
-        if(cy>=0&&cy<rows&&cx>=0&&cx<cols)state.world[cy][cx]=1;
+    for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){const cy2=sr+dy,cx2=sc+dx;if(cy2>=0&&cy2<rows&&cx2>=0&&cx2<cols)state.world[cy2][cx2]=1}
+    state.smoothedCount=49;state.palmCount=0;state.friendCount=0;state.palms=[];state.pals=[];state.particles=[];
+    state.levelJustCompleted=false;levelBar.style.display='block';levelComplete.classList.remove('open');updateLevelUI();
+}
+
+function updateLevelUI(){
+    const level=LEVELS[state.currentLevel];levelNum.textContent=state.currentLevel+1;levelName.textContent=level.emoji+' '+level.name;
+    let total=0,smooth=0;state.world.forEach(row=>row.forEach(tile=>{total++;if(tile===1)smooth++;}));
+    const pct=Math.floor(smooth/total*100);levelFill.style.width=pct+'%';levelPercent.textContent=pct+'%';
+    if(pct>=95&&!state.levelCompleted.includes(state.currentLevel)&&!state.levelJustCompleted){
+        state.levelJustCompleted=true;state.levelCompleted.push(state.currentLevel);
+        state.coins+=level.reward;showLevelComplete();
     }
-    state.smoothedCount=81;state.palmCount=0;state.friendCount=0;state.palms=[];state.pals=[];state.particles=[];
+}
+
+function showLevelComplete(){
+    const level=LEVELS[state.currentLevel];
+    lcEmoji.textContent=level.emoji;lcTitle.textContent='МОЛОДЕЦ!';
+    lcSubtitle.textContent='Ты разгладил: '+level.emoji+' '+level.name;
+    lcReward.textContent=level.reward;
+    // Рисуем разукрашенную фигуру
+    lcCtx.fillStyle='#f5e6d3';lcCtx.fillRect(0,0,200,200);
+    level.draw(lcCtx,200,200);
+    levelComplete.classList.add('open');
+}
+
+function nextLevel(){
+    if(state.currentLevel<LEVELS.length-1){state.currentLevel++}else{state.currentLevel=0}
+    state.player={x:WORLD_W/2,y:WORLD_H/2,angle:0};initWorld();
 }
 
 function spawnGoldenRain(){
-    state.goldenRain.active=true;
-    state.goldenRain.x=state.player.x+random(-300,300);
-    state.goldenRain.y=state.player.y+random(-300,300);
-    state.goldenRain.timer=900;
-    state.goldenRain.drops=[];
-    for(let i=0;i<25;i++)state.goldenRain.drops.push({x:random(-80,80),y:random(-60,0),vy:random(1,3),collected:false});
-    showNotification('🌧️ Золотой дождь! Собирай!');
-}
-
-function spawnWhirlwind(){
-    state.whirlwinds.push({x:state.player.x+random(-400,400),y:state.player.y+random(-400,400),timer:300,coins:25});
+    state.goldenRain.active=true;state.goldenRain.x=state.player.x+random(-300,300);state.goldenRain.y=state.player.y+random(-300,300);
+    state.goldenRain.timer=900;state.goldenRain.drops=[];for(let i=0;i<25;i++)state.goldenRain.drops.push({x:random(-80,80),y:random(-60,0),vy:random(1,3),collected:false});
+    showNotification('🌧️ Золотой дождь!');
 }
 
 function smoothTile(col,row){
     if(row<0||row>=state.world.length||col<0||col>=state.world[0].length)return;
     if(state.world[row][col]===0){
         state.world[row][col]=1;state.smoothedCount++;
-        // Кристальная складка
         const isCrystal=state.crystalTiles.find(t=>t.col===col&&t.row===row);
-        if(isCrystal){
-            state.coins+=15;
-            state.crystalTiles=state.crystalTiles.filter(t=>t.col!==col||t.row!==row);
-            const wx=col*TILE_SIZE+TILE_SIZE/2,wy=row*TILE_SIZE+TILE_SIZE/2;
-            spawnSmoothParticles(wx,wy,'#E040FB');
-            showCloudText(wx-state.camera.x,wy-state.camera.y-20,'💎 +15','#E040FB');
-            if(Math.random()<0.3)showNotification('💎 Хрустальная складка! +15');
-        }else{
-            const earned=Math.floor(getCoinMult());
-            state.coins+=earned;
-            const wx=col*TILE_SIZE+TILE_SIZE/2,wy=row*TILE_SIZE+TILE_SIZE/2;
-            spawnSmoothParticles(wx,wy);
-            // Золотой апельсин 1%
-            if(Math.random()<0.01+getLuckBoost()){
-                state.coins+=50;
-                showNotification('🍊✨ Золотой апельсин! +50!');
-            }
-        }
-        // Пальма
-        if(Math.random()<getPalmChance()+getLuckBoost()&&state.palms.length<80){
-            const px=col*TILE_SIZE+TILE_SIZE/2,py=row*TILE_SIZE+TILE_SIZE/2;
-            state.palms.push({x:px,y:py,size:18+Math.random()*28});state.palmCount++;
-            showCloudText(px-state.camera.x,py-state.camera.y-25,'🌴','#4CAF50');
-        }
-        // Друг
-        if(Math.random()<getFriendChance()+getLuckBoost()&&state.pals.length<30){
-            const fx=col*TILE_SIZE+TILE_SIZE/2+random(-30,30),fy=row*TILE_SIZE+TILE_SIZE/2+random(-30,30);
-            const names=['Пухляш','Бублик','Кнопка','Пончик','Лапка','Кексик','Плюшка','Кокос'];
-            state.pals.push({x:fx,y:fy,angle:random(0,Math.PI*2),animTimer:random(0,100),name:names[Math.floor(Math.random()*names.length)],giftTimer:3600});
-            state.friendCount++;
-            showCloudText(fx-state.camera.x,fy-state.camera.y-20,'🦫 Привет!','#A0792A');
-        }
+        if(isCrystal){state.coins+=15;state.crystalTiles=state.crystalTiles.filter(t=>t.col!==col||t.row!==row);spawnSmoothParticles(col*TILE_SIZE+TILE_SIZE/2,row*TILE_SIZE+TILE_SIZE/2,'#E040FB')}
+        else{state.coins+=Math.floor(getCoinMult());spawnSmoothParticles(col*TILE_SIZE+TILE_SIZE/2,row*TILE_SIZE+TILE_SIZE/2);if(Math.random()<0.01+getLuckBoost()){state.coins+=50;showNotification('🍊✨ Золотой апельсин! +50!')}}
+        if(Math.random()<getPalmChance()+getLuckBoost()&&state.palms.length<80){state.palms.push({x:col*TILE_SIZE+TILE_SIZE/2,y:row*TILE_SIZE+TILE_SIZE/2,size:18+Math.random()*28});state.palmCount++}
+        if(Math.random()<getFriendChance()+getLuckBoost()&&state.pals.length<30){const names=['Пухляш','Бублик','Кнопка','Пончик','Лапка','Кексик','Плюшка','Кокос'];state.pals.push({x:col*TILE_SIZE+TILE_SIZE/2+random(-30,30),y:row*TILE_SIZE+TILE_SIZE/2+random(-30,30),angle:random(0,Math.PI*2),animTimer:random(0,100),name:names[Math.floor(Math.random()*names.length)],giftTimer:3600});state.friendCount++}
     }
+    updateLevelUI();
 }
 
-function smoothArea(cx,cy,radius){
-    const power=getSmoothPower();
-    const sc=Math.floor((cx-radius)/TILE_SIZE),ec=Math.floor((cx+radius)/TILE_SIZE);
-    const sr=Math.floor((cy-radius)/TILE_SIZE),er=Math.floor((cy+radius)/TILE_SIZE);
-    for(let row=sr;row<=er;row++)for(let col=sc;col<=ec;col++)for(let p=0;p<power;p++)smoothTile(col,row);
-}
+function smoothArea(cx,cy,radius){const power=getSmoothPower();const sc=Math.floor((cx-radius)/TILE_SIZE),ec=Math.floor((cx+radius)/TILE_SIZE);const sr=Math.floor((cy-radius)/TILE_SIZE),er=Math.floor((cy+radius)/TILE_SIZE);for(let row=sr;row<=er;row++)for(let col=sc;col<=ec;col++)for(let p=0;p<power;p++)smoothTile(col,row)}
 
-function spawnSmoothParticles(x,y,color){
-    const count=3+Math.floor(getWidth()/10);
-    for(let i=0;i<count;i++)state.particles.push({x,y,vx:random(-2,2),vy:random(-3,-0.5),life:35+random(0,25),type:Math.random()<0.5?'star':'petal',color:color||(Math.random()<0.5?'#FFD700':'#FFB7C5')});
-}
-
-function updateParticles(){
-    state.particles=state.particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.02;p.life--;return p.life>0});
-}
+function spawnSmoothParticles(x,y,color){const count=3+Math.floor(getWidth()/10);for(let i=0;i<count;i++)state.particles.push({x,y,vx:random(-2,2),vy:random(-3,-0.5),life:35+random(0,25),type:Math.random()<0.5?'star':'petal',color:color||(Math.random()<0.5?'#FFD700':'#FFB7C5')})}
+function updateParticles(){state.particles=state.particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.02;p.life--;return p.life>0})}
 
 let autoHealTimer=0;
-function autoHeal(){
-    const r=getAutoHealRadius();if(r<=0)return;
-    autoHealTimer++;if(autoHealTimer>=300){autoHealTimer=0;
-        const px=state.player.x+random(-r,r),py=state.player.y+random(-r,r);smoothTile(Math.floor(px/TILE_SIZE),Math.floor(py/TILE_SIZE));}
-}
+function autoHeal(){const r=getAutoHealRadius();if(r<=0)return;autoHealTimer++;if(autoHealTimer>=300){autoHealTimer=0;const px=state.player.x+random(-r,r),py=state.player.y+random(-r,r);smoothTile(Math.floor(px/TILE_SIZE),Math.floor(py/TILE_SIZE))}}
 
 function saveGame(){
-    const d={smoothedCount:state.smoothedCount,palmCount:state.palmCount,friendCount:state.friendCount,coins:state.coins,currentSkin:state.currentSkin,upgrades:state.upgrades,skins:state.skins,world:state.world,player:state.player,palms:state.palms,pals:state.pals,crystalTiles:state.crystalTiles,dailyBonusClaimed:state.dailyBonusClaimed,lastDate:new Date().toDateString()};
+    const d={smoothedCount:state.smoothedCount,palmCount:state.palmCount,friendCount:state.friendCount,coins:state.coins,currentDozerSkin:state.currentDozerSkin,currentCapySkin:state.currentCapySkin,upgrades:state.upgrades,dozerSkins:state.dozerSkins,capySkins:state.capySkins,world:state.world,player:state.player,palms:state.palms,pals:state.pals,crystalTiles:state.crystalTiles,currentLevel:state.currentLevel,levelCompleted:state.levelCompleted,dailyBonusClaimed:state.dailyBonusClaimed,lastDate:new Date().toDateString()};
     localStorage.setItem('capydozer_save',JSON.stringify(d));
 }
 function loadGame(){
     const s=localStorage.getItem('capydozer_save');if(!s)return false;
-    try{
-        const d=JSON.parse(s);
-        state.smoothedCount=d.smoothedCount||0;state.palmCount=d.palmCount||0;state.friendCount=d.friendCount||0;state.coins=d.coins||0;state.currentSkin=d.currentSkin||0;state.upgrades=d.upgrades||state.upgrades;state.skins=d.skins||state.skins;state.world=d.world||[];state.player=d.player||state.player;state.palms=d.palms||[];state.pals=d.pals||[];state.crystalTiles=d.crystalTiles||[];state.dailyBonusClaimed=d.dailyBonusClaimed||false;
-        // Ежедневный бонус
-        const today=new Date().toDateString();
-        if(d.lastDate!==today){state.dailyBonusClaimed=false;}
-        if(!state.dailyBonusClaimed){state.coins+=100;state.dailyBonusClaimed=true;showNotification('🎁 Ежедневный бонус: +100 🪙!');}
-        if(!state.world.length)initWorld();
-        return true;
-    }catch(e){return false;}
+    try{const d=JSON.parse(s);state.smoothedCount=d.smoothedCount||0;state.palmCount=d.palmCount||0;state.friendCount=d.friendCount||0;state.coins=d.coins||0;state.currentDozerSkin=d.currentDozerSkin||0;state.currentCapySkin=d.currentCapySkin||0;state.upgrades=d.upgrades||state.upgrades;state.dozerSkins=d.dozerSkins||state.dozerSkins;state.capySkins=d.capySkins||state.capySkins;state.world=d.world||[];state.player=d.player||state.player;state.palms=d.palms||[];state.pals=d.pals||[];state.crystalTiles=d.crystalTiles||[];state.currentLevel=d.currentLevel||0;state.levelCompleted=d.levelCompleted||[];state.dailyBonusClaimed=d.dailyBonusClaimed||false;
+    const today=new Date().toDateString();if(d.lastDate!==today){state.dailyBonusClaimed=false}if(!state.dailyBonusClaimed){state.coins+=100;state.dailyBonusClaimed=true;showNotification('🎁 Ежедневный бонус: +100 🪙!')}if(!state.world.length)initWorld();levelBar.style.display='block';updateLevelUI();return true}catch(e){return false}
 }
 function resetGame(){
-    if(confirm('Сбросить весь прогресс?')){
-        localStorage.removeItem('capydozer_save');state.coins=0;state.currentSkin=0;state.smoothedCount=0;state.palmCount=0;state.friendCount=0;state.palms=[];state.pals=[];state.particles=[];state.crystalTiles=[];state.player={x:WORLD_W/2,y:WORLD_H/2,angle:0};
-        Object.keys(state.upgrades).forEach(k=>{state.upgrades[k].level=(k==='speed'||k==='width')?1:0});
-        state.skins.forEach(s=>{s.owned=s.id===0});initWorld();showNotification('🔄 Сброшено!');
-    }
+    if(confirm('Сбросить всё?')){localStorage.removeItem('capydozer_save');state.coins=0;state.currentDozerSkin=0;state.currentCapySkin=0;state.smoothedCount=0;state.palmCount=0;state.friendCount=0;state.palms=[];state.pals=[];state.particles=[];state.crystalTiles=[];state.currentLevel=0;state.levelCompleted=[];state.player={x:WORLD_W/2,y:WORLD_H/2,angle:0};Object.keys(state.upgrades).forEach(k=>{state.upgrades[k].level=(k==='speed'||k==='width')?1:0});state.dozerSkins.forEach(s=>{s.owned=s.id===0});state.capySkins.forEach(s=>{s.owned=s.id===0});initWorld();showNotification('🔄 Сброшено!')}
 }
 
 function update(){
+    if(state.levelComplete.classList.contains('open'))return;
     if(state.input.active){
         const s=getSpeed();state.player.x+=state.input.dx*s;state.player.y+=state.input.dy*s;
         state.player.x=Math.max(30,Math.min(WORLD_W-30,state.player.x));state.player.y=Math.max(30,Math.min(WORLD_H-30,state.player.y));
         if(Math.abs(state.input.dx)>0.1||Math.abs(state.input.dy)>0.1)state.player.angle=Math.atan2(state.input.dy,state.input.dx);
         smoothArea(state.player.x,state.player.y,getWidth());
     }
-    // Друзья + подарки
-    state.pals.forEach(pal=>{
-        pal.animTimer++;if(pal.animTimer>120){pal.animTimer=0;pal.angle=random(0,Math.PI*2);}
-        pal.x+=Math.cos(pal.angle)*0.15;pal.y+=Math.sin(pal.angle)*0.15;
-        pal.x=Math.max(10,Math.min(WORLD_W-10,pal.x));pal.y=Math.max(10,Math.min(WORLD_H-10,pal.y));
-        pal.giftTimer--;if(pal.giftTimer<=0){pal.giftTimer=3600;const gift=3+Math.floor(Math.random()*8);state.coins+=gift;showCloudText(pal.x-state.camera.x,pal.y-state.camera.y-25,'🎁 +'+gift,'#FFD700');}
-    });
-    // Золотой дождь
-    if(state.goldenRain.active){
-        state.goldenRain.timer--;
-        state.goldenRain.drops.forEach(d=>{if(!d.collected){d.y+=d.vy;if(Math.abs(state.player.x-(state.goldenRain.x+d.x))<40&&Math.abs(state.player.y-(state.goldenRain.y+d.y))<40){d.collected=true;state.coins+=3;}}});
-        if(state.goldenRain.timer<=0)state.goldenRain.active=false;
-    }
-    // Вихри
-    state.whirlwinds.forEach(w=>{w.timer--;if(Math.abs(state.player.x-w.x)<35&&Math.abs(state.player.y-w.y)<35){state.coins+=w.coins;w.timer=0;showNotification('🌀 Вихрь удачи! +'+w.coins);}});
-    state.whirlwinds=state.whirlwinds.filter(w=>w.timer>0);
-    // Птичка
-    state.birdCooldown++;if(state.birdCooldown>600&&!state.birdFlying){state.birdFlying=true;state.birdReturnTimer=180;}
-    if(state.birdFlying){state.birdReturnTimer--;if(state.birdReturnTimer<=0){state.birdFlying=false;state.birdCooldown=0;state.coins+=5;showNotification('🐦 Птичка принесла +5 🪙!');}}
-    // Спавн событий
+    state.pals.forEach(pal=>{pal.animTimer++;if(pal.animTimer>120){pal.animTimer=0;pal.angle=random(0,Math.PI*2)}pal.x+=Math.cos(pal.angle)*0.15;pal.y+=Math.sin(pal.angle)*0.15;pal.x=Math.max(10,Math.min(WORLD_W-10,pal.x));pal.y=Math.max(10,Math.min(WORLD_H-10,pal.y));pal.giftTimer--;if(pal.giftTimer<=0){pal.giftTimer=3600;const gift=3+Math.floor(Math.random()*8);state.coins+=gift}});
+    if(state.goldenRain.active){state.goldenRain.timer--;state.goldenRain.drops.forEach(d=>{if(!d.collected){d.y+=d.vy;if(Math.abs(state.player.x-(state.goldenRain.x+d.x))<40&&Math.abs(state.player.y-(state.goldenRain.y+d.y))<40){d.collected=true;state.coins+=3}}});if(state.goldenRain.timer<=0)state.goldenRain.active=false}
+    state.whirlwinds.forEach(w=>{w.timer--;if(Math.abs(state.player.x-w.x)<35&&Math.abs(state.player.y-w.y)<35){state.coins+=w.coins;w.timer=0}});state.whirlwinds=state.whirlwinds.filter(w=>w.timer>0);
+    state.birdCooldown++;if(state.birdCooldown>600&&!state.birdFlying){state.birdFlying=true;state.birdReturnTimer=180}if(state.birdFlying){state.birdReturnTimer--;if(state.birdReturnTimer<=0){state.birdFlying=false;state.birdCooldown=0;state.coins+=5}}
     if(!state.goldenRain.active&&Math.random()<0.0003)spawnGoldenRain();
-    if(state.whirlwinds.length<2&&Math.random()<0.001)spawnWhirlwind();
-    // Камера
-    const tx=state.player.x-canvas.width/2,ty=state.player.y-canvas.height/2;
-    state.camera.x+=(tx-state.camera.x)*0.07;state.camera.y+=(ty-state.camera.y)*0.07;
-    updateParticles();autoHeal();updateHUD();
-}
-
-function updateHUD(){
-    metersEl.textContent=state.smoothedCount;palmsEl.textContent=state.palmCount;friendsEl.textContent=state.friendCount;coinHudEl.textContent=state.coins;
+    if(state.whirlwinds.length<2&&Math.random()<0.001)state.whirlwinds.push({x:state.player.x+random(-400,400),y:state.player.y+random(-400,400),timer:300,coins:25});
+    const tx=state.player.x-canvas.width/2,ty=state.player.y-canvas.height/2;state.camera.x+=(tx-state.camera.x)*0.07;state.camera.y+=(ty-state.camera.y)*0.07;
+    updateParticles();autoHeal();metersEl.textContent=state.smoothedCount;palmsEl.textContent=state.palmCount;friendsEl.textContent=state.friendCount;coinHudEl.textContent=state.coins;
 }
 
 function drawWorld(){
-    const cx=state.camera.x,cy=state.camera.y;
-    const sc=Math.max(0,Math.floor(cx/TILE_SIZE)-1),ec=Math.min(state.world[0].length-1,Math.floor((cx+canvas.width)/TILE_SIZE)+1);
-    const sr=Math.max(0,Math.floor(cy/TILE_SIZE)-1),er=Math.min(state.world.length-1,Math.floor((cy+canvas.height)/TILE_SIZE)+1);
-    for(let row=sr;row<=er;row++)for(let col=sc;col<=ec;col++){
-        const x=col*TILE_SIZE-cx,y=row*TILE_SIZE-cy;
-        // Кристальная складка
-        const isCrystal=state.crystalTiles.find(t=>t.col===col&&t.row===row);
-        if(state.world[row][col]===1){
-            ctx.fillStyle='#FAEBD7';ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);ctx.strokeStyle='rgba(139,105,20,0.1)';ctx.lineWidth=0.5;ctx.strokeRect(x,y,TILE_SIZE,TILE_SIZE);
-        }else if(isCrystal){
-            ctx.fillStyle='#EDE7F6';ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);
-            ctx.strokeStyle='rgba(156,39,176,0.5)';ctx.lineWidth=2;ctx.strokeRect(x,y,TILE_SIZE,TILE_SIZE);
-            ctx.fillStyle='#E040FB';ctx.beginPath();ctx.arc(x+TILE_SIZE/2,y+TILE_SIZE/2,4,0,Math.PI*2);ctx.fill();
-        }else{
-            const shade=175+Math.sin(col*0.5)*18+Math.cos(row*0.5)*18;
-            ctx.fillStyle=`rgb(${shade-15},${shade-35},${shade-55})`;ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);
-            ctx.strokeStyle=`rgba(${shade-30},${shade-50},${shade-70},0.35)`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y+TILE_SIZE*0.35);ctx.quadraticCurveTo(x+TILE_SIZE/2,y+TILE_SIZE*0.55,x+TILE_SIZE,y+TILE_SIZE*0.25);ctx.stroke();
-        }
-    }
-    // Золотой дождь
-    if(state.goldenRain.active){
-        const gx=state.goldenRain.x-cx,gy=state.goldenRain.y-cy;
-        ctx.fillStyle='rgba(255,215,0,0.25)';ctx.beginPath();ctx.arc(gx,gy,90,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#FFD700';ctx.font='20px sans-serif';ctx.fillText('🌧️✨',gx-15,gy-60);
-        state.goldenRain.drops.forEach(d=>{if(!d.collected){ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(gx+d.x,gy+d.y,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#FFF';ctx.beginPath();ctx.arc(gx+d.x-1,gy+d.y-1,2,0,Math.PI*2);ctx.fill();}});
-    }
-    // Вихри
-    state.whirlwinds.forEach(w=>{
-        const wx=w.x-cx,wy=w.y-cy;
-        ctx.fillStyle='rgba(255,215,0,0.3)';ctx.beginPath();ctx.arc(wx,wy,25+Math.sin(Date.now()/200)*8,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#FFD700';ctx.font='18px sans-serif';ctx.fillText('🌀',wx-12,wy+6);
-    });
+    const cx=state.camera.x,cy=state.camera.y;const sc=Math.max(0,Math.floor(cx/TILE_SIZE)-1),ec=Math.min(state.world[0].length-1,Math.floor((cx+canvas.width)/TILE_SIZE)+1);const sr=Math.max(0,Math.floor(cy/TILE_SIZE)-1),er=Math.min(state.world.length-1,Math.floor((cy+canvas.height)/TILE_SIZE)+1);
+    for(let row=sr;row<=er;row++)for(let col=sc;col<=ec;col++){const x=col*TILE_SIZE-cx,y=row*TILE_SIZE-cy;const isCrystal=state.crystalTiles.find(t=>t.col===col&&t.row===row);if(state.world[row][col]===1){ctx.fillStyle='#FAEBD7';ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);ctx.strokeStyle='rgba(139,105,20,0.1)';ctx.lineWidth=0.5;ctx.strokeRect(x,y,TILE_SIZE,TILE_SIZE)}else if(isCrystal){ctx.fillStyle='#EDE7F6';ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);ctx.strokeStyle='rgba(156,39,176,0.5)';ctx.lineWidth=2;ctx.strokeRect(x,y,TILE_SIZE,TILE_SIZE);ctx.fillStyle='#E040FB';ctx.beginPath();ctx.arc(x+TILE_SIZE/2,y+TILE_SIZE/2,4,0,Math.PI*2);ctx.fill()}else{const shade=175+Math.sin(col*0.5)*18+Math.cos(row*0.5)*18;ctx.fillStyle=`rgb(${shade-15},${shade-35},${shade-55})`;ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);ctx.strokeStyle=`rgba(${shade-30},${shade-50},${shade-70},0.35)`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y+TILE_SIZE*0.35);ctx.quadraticCurveTo(x+TILE_SIZE/2,y+TILE_SIZE*0.55,x+TILE_SIZE,y+TILE_SIZE*0.25);ctx.stroke()}}
+    if(state.goldenRain.active){const gx=state.goldenRain.x-cx,gy=state.goldenRain.y-cy;ctx.fillStyle='rgba(255,215,0,0.25)';ctx.beginPath();ctx.arc(gx,gy,90,0,Math.PI*2);ctx.fill();state.goldenRain.drops.forEach(d=>{if(!d.collected){ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(gx+d.x,gy+d.y,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#FFF';ctx.beginPath();ctx.arc(gx+d.x-1,gy+d.y-1,2,0,Math.PI*2);ctx.fill()}})}
+    state.whirlwinds.forEach(w=>{const wx=w.x-cx,wy=w.y-cy;ctx.fillStyle='rgba(255,215,0,0.3)';ctx.beginPath();ctx.arc(wx,wy,25+Math.sin(Date.now()/200)*8,0,Math.PI*2);ctx.fill()})
 }
-
-function drawPalms(){
-    state.palms.forEach(p=>{
-        const x=p.x-state.camera.x,y=p.y-state.camera.y;
-        ctx.fillStyle='#A0522D';ctx.fillRect(x-2,y,5,p.size);
-        ctx.fillStyle='#4CAF50';ctx.beginPath();ctx.arc(x,y,p.size*0.75,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#388E3C';ctx.beginPath();ctx.arc(x-p.size*0.25,y-p.size*0.15,p.size*0.45,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(x+p.size*0.25,y-p.size*0.15,p.size*0.45,0,Math.PI*2);ctx.fill();
-    });
-}
-
-function drawPals(){
-    state.pals.forEach(pal=>{
-        const x=pal.x-state.camera.x,y=pal.y-state.camera.y;
-        ctx.fillStyle='#A0792A';ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='white';ctx.beginPath();ctx.arc(x-4,y-3,3.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(x+4,y-3,3.5,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#1a1a1a';ctx.beginPath();ctx.arc(x-4,y-3,1.8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(x+4,y-3,1.8,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#FF8C00';ctx.beginPath();ctx.arc(x,y-16,5,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#5D4037';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(pal.name,x,y-24);
-    });
-}
-
+function drawPalms(){state.palms.forEach(p=>{const x=p.x-state.camera.x,y=p.y-state.camera.y;ctx.fillStyle='#A0522D';ctx.fillRect(x-2,y,5,p.size);ctx.fillStyle='#4CAF50';ctx.beginPath();ctx.arc(x,y,p.size*0.75,0,Math.PI*2);ctx.fill()})}
+function drawPals(){state.pals.forEach(pal=>{const x=pal.x-state.camera.x,y=pal.y-state.camera.y;ctx.fillStyle='#A0792A';ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill();ctx.fillStyle='white';ctx.beginPath();ctx.arc(x-4,y-3,3.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(x+4,y-3,3.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1a1a1a';ctx.beginPath();ctx.arc(x-4,y-3,1.8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(x+4,y-3,1.8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#FF8C00';ctx.beginPath();ctx.arc(x,y-16,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#5D4037';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(pal.name,x,y-24)})}
 function drawPlayer(){
-    const x=state.player.x-state.camera.x,y=state.player.y-state.camera.y;
-    const skin=state.skins[state.currentSkin];
+    const x=state.player.x-state.camera.x,y=state.player.y-state.camera.y;const dozer=state.dozerSkins[state.currentDozerSkin];const capy=state.capySkins[state.currentCapySkin];
     ctx.save();ctx.translate(x,y);ctx.rotate(state.player.angle);
     ctx.fillStyle='#444';ctx.fillRect(-28,-10,56,11);ctx.fillRect(-28,7,56,11);
-    const bc=['#FFD54F','#F44336','#D7CCC8','#E8D5B7','#FFD700','#FF4081','#311B92','#FFB74D'];
-    ctx.fillStyle=bc[skin.id]||'#FFD54F';ctx.fillRect(-26,-14,52,28);ctx.strokeStyle='#5D4037';ctx.lineWidth=2;ctx.strokeRect(-26,-14,52,28);
+    const bc=['#FFD54F','#F44336','#D7CCC8','#E8D5B7','#FFD700','#FF4081','#311B92','#FFB74D'];ctx.fillStyle=bc[dozer.id]||'#FFD54F';ctx.fillRect(-26,-14,52,28);ctx.strokeStyle='#5D4037';ctx.lineWidth=2;ctx.strokeRect(-26,-14,52,28);
     ctx.fillStyle='rgba(255,255,255,0.6)';ctx.fillRect(-8,-20,18,10);ctx.strokeStyle='#5D4037';ctx.lineWidth=1;ctx.strokeRect(-8,-20,18,10);
     ctx.fillStyle='#757575';ctx.beginPath();ctx.moveTo(28,-16);ctx.lineTo(36,-20);ctx.lineTo(36,16);ctx.lineTo(28,20);ctx.closePath();ctx.fill();ctx.strokeStyle='#444';ctx.lineWidth=2;ctx.stroke();
+    // Капибара
     ctx.fillStyle='#8B6914';ctx.beginPath();ctx.arc(0,-20,9,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#2196F3';ctx.fillRect(-7,-31,14,5);ctx.fillRect(-4,-33,8,4);
+    // Аксессуары капибары
+    if(capy.hat==='crown'){ctx.fillStyle='#FFD700';ctx.fillRect(-7,-37,14,6);ctx.fillRect(-5,-41,10,5)}
+    else if(capy.hat==='cap'){ctx.fillStyle='#2196F3';ctx.fillRect(-7,-31,14,5);ctx.fillRect(-4,-33,8,4)}
+    else if(capy.hat==='glasses'){ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(-4,-21,4,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(4,-21,4,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(0,-21);ctx.lineTo(0,-21);ctx.stroke()}
+    else if(capy.hat==='bow'){ctx.fillStyle='#E91E63';ctx.beginPath();ctx.arc(-5,-30,4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(5,-30,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#F06292';ctx.beginPath();ctx.arc(0,-28,3,0,Math.PI*2);ctx.fill()}
+    else if(capy.hat==='ninja'){ctx.fillStyle='#333';ctx.fillRect(-9,-33,18,5);ctx.fillRect(-7,-28,14,3)}
+    else if(capy.hat==='beanie'){ctx.fillStyle='#FF5722';ctx.beginPath();ctx.arc(0,-26,10,Math.PI,0);ctx.fill();ctx.fillRect(-10,-26,20,4)}
+    else if(capy.hat==='tophat'){ctx.fillStyle='#333';ctx.fillRect(-6,-36,12,10);ctx.fillRect(-9,-26,18,3)}
+    else if(capy.hat==='flower'){ctx.fillStyle='#FF69B4';ctx.beginPath();ctx.arc(-6,-28,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(-6,-28,2,0,Math.PI*2);ctx.fill()}
+    // Птичка
     ctx.fillStyle='#FFD54F';ctx.beginPath();ctx.arc(-18,-18,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#FF8C00';ctx.beginPath();ctx.moveTo(-16,-20);ctx.lineTo(-12,-18);ctx.lineTo(-16,-17);ctx.fill();
     ctx.restore();
-    ctx.font='14px sans-serif';ctx.textAlign='center';ctx.fillText(skin.emoji,x,y-33);
+    ctx.font='14px sans-serif';ctx.textAlign='center';ctx.fillText(dozer.emoji,x,y-33);
 }
+function drawParticles(){state.particles.forEach(p=>{const x=p.x-state.camera.x,y=p.y-state.camera.y,alpha=p.life/60;ctx.fillStyle=p.color.replace(')',`,${alpha})`).replace('rgb','rgba');if(p.type==='star'){ctx.font=`${7+p.life/8}px sans-serif`;ctx.fillText('✦',x,y)}else{ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill()}})}
+function drawMinimap(){const mw=60,mh=60;minimapCtx.fillStyle='rgba(0,0,0,0.5)';minimapCtx.beginPath();minimapCtx.arc(30,30,29,0,Math.PI*2);minimapCtx.fill();const sx=mw/WORLD_W,sy=mh/WORLD_H;minimapCtx.fillStyle='#4CAF50';state.palms.forEach(p=>{minimapCtx.fillRect(p.x*sx-0.5,p.y*sy-0.5,1,1)});minimapCtx.fillStyle='#FF8C00';minimapCtx.beginPath();minimapCtx.arc(state.player.x*sx,state.player.y*sy,2.5,0,Math.PI*2);minimapCtx.fill()}
 
-function drawParticles(){
-    state.particles.forEach(p=>{
-        const x=p.x-state.camera.x,y=p.y-state.camera.y,alpha=p.life/60;
-        ctx.fillStyle=p.color.replace(')',`,${alpha})`).replace('rgb','rgba');
-        if(p.type==='star'){ctx.font=`${7+p.life/8}px sans-serif`;ctx.fillText('✦',x,y);}
-        else{ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();}
-    });
-}
+function draw(){canvas.width=wrapper.clientWidth;canvas.height=wrapper.clientHeight;ctx.fillStyle='#E8D5B7';ctx.fillRect(0,0,canvas.width,canvas.height);drawWorld();drawPalms();drawPals();drawParticles();drawPlayer();drawMinimap()}
 
-function drawMinimap(){
-    const mw=60,mh=60;minimapCtx.fillStyle='rgba(0,0,0,0.5)';minimapCtx.beginPath();minimapCtx.arc(30,30,29,0,Math.PI*2);minimapCtx.fill();
-    const sx=mw/WORLD_W,sy=mh/WORLD_H;
-    minimapCtx.fillStyle='#4CAF50';state.palms.forEach(p=>{minimapCtx.fillRect(p.x*sx-0.5,p.y*sy-0.5,1,1)});
-    minimapCtx.fillStyle='#FF8C00';minimapCtx.beginPath();minimapCtx.arc(state.player.x*sx,state.player.y*sy,2.5,0,Math.PI*2);minimapCtx.fill();
-    if(state.goldenRain.active){minimapCtx.fillStyle='#FFD700';minimapCtx.beginPath();minimapCtx.arc(state.goldenRain.x*sx,state.goldenRain.y*sy,4,0,Math.PI*2);minimapCtx.fill();}
-}
+function togglePanel(p){const io=p.classList.contains('open');panelUpgrade.classList.remove('open');panelShop.classList.remove('open');panelLevels.classList.remove('open');if(!io)p.classList.add('open');if(p===panelShop&&!io){renderShop()}if(p===panelUpgrade&&!io)renderUpgrades();if(p===panelLevels&&!io)renderLevels()}
 
-function draw(){canvas.width=wrapper.clientWidth;canvas.height=wrapper.clientHeight;ctx.fillStyle='#E8D5B7';ctx.fillRect(0,0,canvas.width,canvas.height);drawWorld();drawPalms();drawPals();drawParticles();drawPlayer();drawMinimap();}
-
-function togglePanel(p){
-    const io=p.classList.contains('open');panelUpgrade.classList.remove('open');panelShop.classList.remove('open');
-    if(!io)p.classList.add('open');
-    if(p===panelShop&&!io)renderShop();if(p===panelUpgrade&&!io)renderUpgrades();
-}
 function renderShop(){
     shopCoinsEl.textContent=state.coins;shopGrid.innerHTML='';
-    state.skins.forEach(skin=>{
-        const c=document.createElement('div');c.className='skin-card';if(skin.owned)c.classList.add('owned');if(skin.id===state.currentSkin)c.classList.add('selected');
-        c.innerHTML=`<div class="skin-emoji">${skin.emoji}</div><div class="skin-name">${skin.name}</div>${!skin.owned?`<div class="skin-price">🪙 ${skin.price}</div>`:skin.id===state.currentSkin?'<div class="skin-price" style="color:#FFD700">Выбрано ✓</div>':'<div class="skin-price" style="color:#4CAF50">Куплено ✓</div>'}`;
-        c.addEventListener('click',()=>{if(skin.owned){state.currentSkin=skin.id;renderShop();showNotification(`🚜 "${skin.name}" выбран!`)}else if(state.coins>=skin.price){state.coins-=skin.price;skin.owned=true;state.currentSkin=skin.id;renderShop();updateHUD();showNotification(`✅ "${skin.name}" куплен!`)}else showNotification('🪙 Мало монет!')});
+    const skins=state.currentTab==='dozer'?state.dozerSkins:state.capySkins;
+    const currentSkin=state.currentTab==='dozer'?state.currentDozerSkin:state.currentCapySkin;
+    skins.forEach(skin=>{
+        const c=document.createElement('div');c.className='skin-card';if(skin.owned)c.classList.add('owned');if(skin.id===currentSkin)c.classList.add('selected');
+        c.innerHTML=`<div class="skin-emoji">${skin.emoji}</div><div class="skin-name">${skin.name}</div>${!skin.owned?`<div class="skin-price">🪙 ${skin.price}</div>`:skin.id===currentSkin?'<div class="skin-price" style="color:#FFD700">Выбрано ✓</div>':'<div class="skin-price" style="color:#4CAF50">Куплено ✓</div>'}`;
+        c.addEventListener('click',()=>{if(skin.owned){if(state.currentTab==='dozer')state.currentDozerSkin=skin.id;else state.currentCapySkin=skin.id;renderShop()}else if(state.coins>=skin.price){state.coins-=skin.price;skin.owned=true;if(state.currentTab==='dozer')state.currentDozerSkin=skin.id;else state.currentCapySkin=skin.id;renderShop()}else showNotification('🪙 Мало монет!')});
         shopGrid.appendChild(c);
     });
 }
-function renderUpgrades(){
-    upgradeCoinsEl.textContent=state.coins;upgradeGrid.innerHTML='';
-    Object.entries(state.upgrades).forEach(([key,up])=>{
-        const cost=Math.floor(up.baseCost*(up.level+1));
-        const c=document.createElement('div');c.className='upgrade-card';
-        c.innerHTML=`<div class="upgrade-info"><div class="upgrade-name">${up.emoji} ${up.name}</div><div class="upgrade-desc">${up.desc}</div><div class="upgrade-level">Уровень ${up.level}/${up.max}</div></div><button class="upgrade-btn${up.level>=up.max?' max':''}" data-key="${key}">${up.level>=up.max?'MAX':'🪙 '+cost}</button>`;
-        c.querySelector('button').addEventListener('click',()=>{if(up.level>=up.max)return;if(state.coins>=cost){state.coins-=cost;up.level++;renderUpgrades();updateHUD();showNotification(`${up.emoji} ${up.name} +1!`)}else showNotification('🪙 Мало монет!')});
-        upgradeGrid.appendChild(c);
-    });
-}
+
+function renderUpgrades(){upgradeCoinsEl.textContent=state.coins;upgradeGrid.innerHTML='';Object.entries(state.upgrades).forEach(([key,up])=>{const cost=Math.floor(up.baseCost*(up.level+1));const c=document.createElement('div');c.className='upgrade-card';c.innerHTML=`<div class="upgrade-info"><div class="upgrade-name">${up.emoji} ${up.name}</div><div class="upgrade-desc">${up.desc}</div><div class="upgrade-level">Уровень ${up.level}/${up.max}</div></div><button class="upgrade-btn${up.level>=up.max?' max':''}">${up.level>=up.max?'MAX':'🪙 '+cost}</button>`;c.querySelector('button').addEventListener('click',()=>{if(up.level>=up.max)return;if(state.coins>=cost){state.coins-=cost;up.level++;renderUpgrades()}else showNotification('🪙 Мало монет!')});upgradeGrid.appendChild(c)})}
+
+function renderLevels(){levelsGrid.innerHTML='';LEVELS.forEach((level,i)=>{const c=document.createElement('div');c.className='skin-card';if(state.levelCompleted.includes(i))c.classList.add('owned');if(i===state.currentLevel)c.classList.add('selected');c.innerHTML=`<div class="skin-emoji">${level.emoji}</div><div class="skin-name">${level.name}</div>${state.levelCompleted.includes(i)?'<div class="skin-price" style="color:#4CAF50">✅ Пройден</div>':i===state.currentLevel?'<div class="skin-price" style="color:#FFD700">🔄 В процессе</div>':'<div class="skin-price" style="color:#aaa">🔒</div>'}`;c.addEventListener('click',()=>{state.currentLevel=i;state.player={x:WORLD_W/2,y:WORLD_H/2,angle:0};initWorld();panelLevels.classList.remove('open')});levelsGrid.appendChild(c)})}
 
 function initJoystick(){
     const base=joystickBase,thumb=joystickThumb,maxDist=45;
@@ -437,8 +409,7 @@ function initJoystick(){
     function hm(e){e.preventDefault();if(!state.input.active)return;const t=e.touches?e.touches[0]:e;uj(t.clientX,t.clientY)}
     function he(e){e.preventDefault();state.input.active=false;state.input.dx=0;state.input.dy=0;thumb.classList.remove('active');thumb.style.transform='translate(-50%,-50%)'}
     function uj(cx,cy){let dx=cx-state.input.centerX,dy=cy-state.input.centerY;const d=Math.sqrt(dx*dx+dy*dy),cl=Math.min(d,maxDist),a=Math.atan2(dy,dx);if(d>8){state.input.dx=Math.cos(a)*(d/maxDist);state.input.dy=Math.sin(a)*(d/maxDist)}else{state.input.dx=0;state.input.dy=0}thumb.style.transform=`translate(calc(-50% + ${Math.cos(a)*cl}px), calc(-50% + ${Math.sin(a)*cl}px))`}
-    base.addEventListener('touchstart',hs,{passive:false});base.addEventListener('touchmove',hm,{passive:false});base.addEventListener('touchend',he);base.addEventListener('touchcancel',he);
-    base.addEventListener('mousedown',hs);window.addEventListener('mousemove',e=>{if(state.input.active)hm(e)});window.addEventListener('mouseup',()=>{if(state.input.active)he({preventDefault:()=>{}})});
+    base.addEventListener('touchstart',hs,{passive:false});base.addEventListener('touchmove',hm,{passive:false});base.addEventListener('touchend',he);base.addEventListener('touchcancel',he);base.addEventListener('mousedown',hs);window.addEventListener('mousemove',e=>{if(state.input.active)hm(e)});window.addEventListener('mouseup',()=>{if(state.input.active)he({preventDefault:()=>{}})})
 }
 
 let autoSaveTimer=0;
@@ -447,12 +418,17 @@ function gameLoop(){update();draw();autoSaveTimer++;if(autoSaveTimer>=600){autoS
 function init(){
     if(!loadGame())initWorld();
     initJoystick();
+    document.getElementById('btnLevels').addEventListener('click',()=>togglePanel(panelLevels));
     document.getElementById('btnUpgrade').addEventListener('click',()=>togglePanel(panelUpgrade));
     document.getElementById('btnShop').addEventListener('click',()=>togglePanel(panelShop));
     document.getElementById('btnReset').addEventListener('click',resetGame);
     document.getElementById('closeUpgrade').addEventListener('click',()=>panelUpgrade.classList.remove('open'));
     document.getElementById('closeShop').addEventListener('click',()=>panelShop.classList.remove('open'));
-    updateHUD();gameLoop();
+    document.getElementById('closeLevels').addEventListener('click',()=>panelLevels.classList.remove('open'));
+    document.getElementById('lcNext').addEventListener('click',nextLevel);
+    // Вкладки магазина
+    document.querySelectorAll('.panel-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');state.currentTab=tab.dataset.tab;renderShop()})});
+    updateLevelUI();gameLoop();
 }
 init();
 })();
